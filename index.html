@@ -1,0 +1,303 @@
+<!doctype html>
+<head>
+	<title>Nicomachus Game Demo</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="Didjiman/Matthew S. Harris JavaScript game Nicomachus Page">
+	<meta name="Keywords" content="Matthew Harris, Matthew S Harris, Matthew S. Harris, Didjiman, JavaScript,
+                               MS Access, MS Office, MS Excel, MS Word, VBA, Visual Basic for Applications, VB, Visual Basic, 
+                               Visual Studio, .NET, database, databases, custom software, custom calculator, 
+                               web scraping, didgeridoo, didjeridu, yidaki, yirdaki">
+	<meta name="author" content="Matthew S Harris">
+
+<script>
+
+function guessed(x) {
+   var s = "";
+
+   if (x =="Yes") {
+     s = document.getElementById("answer").innerHTML;
+     s = s + "<br>I guessed your number correctly! How about that!<br>Try another number!";
+     s = document.getElementById("answer").innerHTML = s;
+     document.getElementById("error").innerHTML = ""; //blank out error message
+     init(); //restart the game
+
+//     alert("user verifies computer guess");
+     }
+   else if (x == "No") {
+      s = "I feel your arithmetic is in error (or you made a mistake entering the remainder values)!<br>Try another number!"
+      document.getElementById("error").innerHTML = s;
+      init();
+
+
+//      alert("USER DOES NOT verify computer guess");
+   }
+   // now disable the yes and no buttons, regardless of user input
+   document.getElementById("guessY").disabled = true;
+   document.getElementById("guessN").disabled = true;
+}   //END OF guessed FUNCTION
+
+function myisInt(x) {
+//this function is the work-around for the fact that IE does not support the JS is integer function. :( 
+
+//alert("myisInt x = " + x);
+
+   var y = x.toString();   //convert the argument to a string so that parseInt will work correctly
+
+   y = parseInt(y);
+
+//alert("myisInt after parseInt y = " + y);
+
+   y = Number(y);  //ensure y is a number
+
+  if ( x==y) { 
+      // the orginal value of x and its integer conversion are the same, so x must have started out as an integer
+//      alert("x = y, so x is an integer!!");
+       return true; 
+   }
+   else {
+//    alert("x IS NOT an integer");
+    return false;
+   }
+
+}   //END OF myisInt FUNCTION
+
+function fixupInput(x) {
+//this function "fixes up" the user input for the Nicomachus game:
+//1. converts an empty string to null
+// 2. changes fractional numbers to integers
+// 3. converts negative numbers to their absolute value.
+
+//alert("x is: " + x);
+
+  if (x === ""){x = null}
+  
+  //convert the input to an integer, if necessary
+x = x.toString();
+x = parseInt(x);
+
+
+  
+//alert("x after parseInt: " + x);
+  
+  if (!(myisInt(x))) {
+    // input is not an integer, convert it to an integer
+    x= x.toString();
+    x = parseInt(x) };
+  
+ //if the input is a negative number, convert to its absolute value
+  if (x < 0 ) {x = Math.abs(x)}
+  
+// alert("x is: '" + x + "'");
+	
+return x;  //return the "fixed up" value
+	
+}  //end of fixupInput
+
+
+
+function makeguess() {
+
+   var s ="";   //scratchpad string
+   var remainder1=0;  //div by 3 remainder
+   var remainder2=0;  //div by 5 remainder
+   var remainder3=0;  //div by 7 remainder
+
+   //validate each of the three inputs: remainder afer dividing by 3, remainder after dividing by 5, and remainder after dividing by 7
+   remainder1 =  document.getElementById("txtdivby3").value;
+   remainder2 = document.getElementById("txtdivby5").value;
+   remainder3 = document.getElementById("txtdivby7").value;
+
+   //ensure that the input values are not blank
+   if (remainder1 == "") {
+      s = "you must enter a value for the remainder of dividing your number by 3! If there is no remainder, enter '0'. Please try again!"
+      document.getElementById("error").innerHTML = s;
+      document.getElementById("divby3").style="color:red;";
+      document.getElementById("divby3").focus();
+      return;   //bail out, no more work to do
+   }
+
+   if (remainder2 == "") {
+      s = "you must enter a value for the remainder of dividing your number by 5! If there is no remainder, enter '0'. Please try again!"
+      document.getElementById("error").innerHTML = s;
+//      document.getElementById("divby3").style="color:red;";
+//      document.getElementById("divby3").focus();
+      return;   //bail out, no more work to do
+   }
+
+   if (remainder3 == "") {
+      s = "you must enter a value for the remainder of dividing your number by 7! If there is no remainder, enter '0'. Please try again!"
+      document.getElementById("error").innerHTML = s;
+//      document.getElementById("divby3").style="color:red;";
+//      document.getElementById("divby3").focus();
+      return;   //bail out, no more work to do
+   }
+
+   remainder1 = Number(remainder1); //ensure this is a number
+   remainder2 = Number(remainder2);
+   remainder3 = Number(remainder3);
+
+//alert ("div by 3 remainder is: " + remainder1);
+   //fixup inputs -- convert all entries to positive integers.
+   remainder1 = fixupInput(remainder1);
+   remainder2 = fixupInput(remainder2);
+   remainder3 = fixupInput(remainder3);
+//alert("DIV BY 3 REMAINDER AFTER FIXUP IS: " + remainder1);
+//alert("DIV BY 5 REMAINDER AFTER FIXUP IS: " + remainder2);
+//alert("DIV BY 7 REMAINDER AFTER FIXUP IS: " + remainder3);
+
+   // write "fixed-up" values back into their inputs
+   document.getElementById("txtdivby3").value = remainder1;
+   document.getElementById("txtdivby5").value = remainder2;
+   document.getElementById("txtdivby7").value = remainder3;
+
+   // at this point we can do the math to "guess" the user's number
+//   alert("Let Me think a moment... \nClick 'OK' to see my guess for the number you picked.");
+
+   var guess = 0; // this will hold the computed 'guess' for the user's number
+   var answr;
+   var s = "";
+
+   guess = (70 * remainder1 ) + (21 * remainder2) + (15 * remainder3);
+   do {
+  
+//  alert("Interim calc on 'guess' is: " + guess);
+  
+    if (guess> 105) {guess = guess-105;}	
+    } while (guess > 105)
+//      answr = prompt("Your number was: " + guess + " right? \nClick 'OK' for Yes or 'Cancel' for No");
+//      if (answr === null) {alert("I feel your arithmetic is in error.");}
+   document.getElementById("answer").innerHTML = "Let me think a moment...<br>Your number was: " + guess + " right?<br>Click the 'Yes' button to verify that the computer correctly guessed your number, <br>or click the 'No' button if the computer did not correctly guess your number."
+
+   //enable the Yes and No buttons so that user can verify computer guess
+   document.getElementById("guessY").disabled = false;
+   document.getElementById("guessN").disabled = false;
+
+
+}   // END makeguess FUNCTION
+
+
+function init() {
+
+   document.getElementById("txtdivby3").focus();
+
+   //clear all the input boxes
+   document.getElementById("txtdivby3").value = "";
+   document.getElementById("txtdivby5").value = "";
+   document.getElementById("txtdivby7").value = "";
+
+   //clear all textboxes
+
+}   //END INIT FUNCTION
+</script>
+	<!-- FB stuff -->
+	<meta property="fb:admins" content="100005648886426" /> <!-- for FB analytics -->
+<!-- ELEMENTS NEEDED FOR BOTH FACEBOOK LIKE AND SHARE BUTTONS -->
+    <meta property="og:url"           content="http://www.didjiman.com/business/Nicomachus.html" />
+    <meta property="og:type"          content="website" />
+    <meta property="og:title"         content="Matthew S Harris - JS Demonstration Apps" />
+    <meta property="og:description"   content="'Nicomachus' game application by Matthew S Harris" />
+    <meta property="og:image"         content="http://www.didjiman.com/images/fbs-biz.jpg" />
+<!-- END OF FACEBOOK Stuff -->
+
+</head>
+
+<body onload="init();">
+<!-- STUFF FOR GOOGLE ADS -->
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({
+          google_ad_client: "ca-pub-2327563481826994",
+          enable_page_level_ads: true
+     });
+</script>
+
+<!-- GOOGLE BANNER AD -->
+<div style="width:970px;height:250px;margin-left:auto;margin-right:auto;">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- jsgame -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:250px"
+     data-ad-client="ca-pub-2327563481826994"
+     data-ad-slot="2625067379"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+
+
+
+	<!-- FB stuff -->
+<div id="fb-root" style="width:20%;margin-left:auto;margin-right:auto;">
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.8";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+</div>
+
+<h1 style="text-align:center;">Nicomachus Game</h1>
+<p style="text-align:center;font-size:10pt;font-style:italic;"><strong>Page design and JavaScript code copyright &copy; 2018 by Matthew S Harris.</strong><br>
+based on a program from the book "BASIC Computer Games", published by Workman Publishing, and copyright 1978 by Creative Computing.</p>
+<!-- FB Like & Share -->
+<div style="text-align:center;">
+<div class="fb-like" data-href="http://www.didjiman.com/business/cv-swareJS.htm" data-layout="button_count" 
+data-action="like" data-size="small" data-show-faces="false" data-share="true" style="margin-left:auto;margin-right:auto;">
+</div>
+
+<p style="font-weight:bold;text-align:center;">Think of a number from 1 to 100.<br><br> 
+Then enter information about your number in the text boxes below. When you have entered all of the requested information, click the 
+<em>Guess</em> button to have the computer guess the number you are thinking of</p>
+<p style="font-weight:bold;text-align:center;">
+If you are not sure what a 'remainder' is, take a look at 
+the explanation <a href="https://www.mathsisfun.com/definitions/remainder.html" target="_blank">here</a>.</p>
+
+<table style="width:50%;margin-left:auto;margin-right:auto;border:1px solid blue;border-collapse:collapse;">
+<!-- DIVIDE BY 3 REMAINDER -->
+<tr>
+<td id="divby3"  style="text-align:right;font-weight:bold;border:1px solid blue;">
+<label id="lbldivby3" for="Name" style="text-align:right;color=yellow;">
+<span id="divby3">Enter the remainder of dividing your number by 3:</span></label>
+</td>
+ 
+ 
+<td>
+<input type="text" name="txtdivby3" id="txtdivby3" value="">
+</td>
+
+</tr>
+
+<!-- DIVIDE BY 5 REMAINDER -->
+<tr>
+<td id="pleasedtomeet" style="text-align:right;font-weight:bold;border:1px solid blue;"> <!-- PLEASED TO MEET YOU -->
+<label id="lbldivby5" for="Name" style="text-align:right;">Enter the remainder of dividing your number by 5:</label>
+</td>
+<td >
+<input input type="text" name="txtdivby5" id="txtdivby5">
+</tr>
+
+<!-- DIVIDE BY 7 REMAINDER -->
+<tr>
+<td style="border:1px solid blue;text-align:right;"> 
+<label id="lbldivby7" for="Name" style="font-weight:bold;text-align:right;">Enter the remainder of dividing your number by 7:</label>
+</td>
+<td>
+<input input type="text" name="txtdivby7" id="txtdivby7">
+</tr>
+
+</table>
+
+<!-- END OF GAME MESSAGE -->
+<p id="output" style="font-weight:bold;text-align:center;">
+<button id="guess" class=button onclick="makeguess();">Guess</button></p>
+<p id="answer" style="font-weight:bold;text-align:center;color:green;font-size:18pt;"></p>
+
+<p style="text-align:center;">
+<span id="sorted"></span><button class=button id="guessY" onclick="guessed('Yes');" disabled>Yes</button>
+<button class=button id="guessN" onclick="guessed('No');" disabled>No</button>
+</p>
+
+<p id="error" style="font-weight:bold;text-align:center;color:red;font-size:18pt;"></p>
+</body>
+
+</html>
+
